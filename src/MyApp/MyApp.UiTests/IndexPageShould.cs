@@ -9,6 +9,7 @@ namespace MyApp.UiTests;
 public class IndexPageShould
 {
     private const string BaseUrl = "https://localhost:7173/";
+
     private readonly ITestOutputHelper _testOutputHelper;
 
     public IndexPageShould(ITestOutputHelper testOutputHelper)
@@ -22,23 +23,25 @@ public class IndexPageShould
     {
         // Arrange
         using var driver = new ChromeDriver();
-        const string expectedHeadingText = "BAD EXPECTATION!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!";
+        const string expectedHeadingText = "Welcome";
         driver.Manage().Window.Size = new Size(480, 960);
         
         // Act
         driver.Navigate().GoToUrl(BaseUrl);
-        Task.Delay(5000).Wait();
+        await Task.Delay(1000);
 
         var screenShot = driver.GetScreenshot();
-        screenShot.SaveAsFile($"../../../ScreenShots/{nameof(IndexPageShould)}_{nameof(ContainTheCorrectHeadingText)}_{DateTime.Now.Date:yyyy-MM-dd}.png", ScreenshotImageFormat.Png);
+        var fileName = $"{nameof(IndexPageShould)}_{nameof(ContainTheCorrectHeadingText)}_{DateTime.Now.Date:yyyy-MM-dd}.png";
+        screenShot.SaveAsFile($"../../../ScreenShots/{fileName}", ScreenshotImageFormat.Png);
         _testOutputHelper.WriteLine($"Screenshot saved to {nameof(IndexPageShould)}_{nameof(ContainTheCorrectHeadingText)}_{DateTime.Now.Date:yyyy-MM-dd}.png");
 
         // Assert
-        var actualHeadingText = driver.FindElement(By.TagName("h1")).Text;
+        var actualHeadingText = driver.FindElement(By.TagName("h1"), TimeSpan.FromSeconds(1)).Text;
+        
+        _testOutputHelper.WriteLine($"Actual heading text: {actualHeadingText}");
+
         actualHeadingText.Should().BeEquivalentTo(expectedHeadingText);
 
-        _testOutputHelper.WriteLine($"Actual heading text: {actualHeadingText}");
-        
         driver.Quit();
     }
 }
